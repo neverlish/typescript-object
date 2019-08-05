@@ -15,6 +15,17 @@ class Bag {
   private invitation: Invitation;
   private ticket: Ticket;
 
+  public hold(ticket: Ticket): number {
+    if (this.hasInvitation()) {
+      this.setTicket(ticket);
+      return 0;
+    } else {
+      this.setTicket(ticket);
+      this.minusAmount(ticket.getFee());
+      return ticket.getFee();
+    }
+  }
+
   public hasInvitation(): boolean {
     return this.invitation != null;
   }
@@ -55,14 +66,7 @@ class Audience {
   }
 
   public buy(ticket: Ticket): number {
-    if (this.bag.hasInvitation()) {
-      this.bag.setTicket(ticket);
-      return 0;
-    } else {
-      this.bag.setTicket(ticket);
-      this.bag.minusAmount(ticket.getFee());
-      return ticket.getFee();
-    }
+    return this.bag.hold(ticket);
   }
 }
 
@@ -77,6 +81,10 @@ class TicketOffice {
 
   public getTicket(): Ticket {
     return this.tickets.pop();
+  }
+
+  public sellTicketTo(audience: Audience): void {
+    this.plusAmount(audience.buy(this.getTicket()));
   }
 
   public minusAmount(amount: number): void {
@@ -96,7 +104,7 @@ class TicketSeller {
   }
 
   public sellTo(audience: Audience): void {
-    this.ticketOffice.plusAmount(audience.buy(this.ticketOffice.getTicket()));
+    this.ticketOffice.sellTicketTo(audience);
   }
 }
 
